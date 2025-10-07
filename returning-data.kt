@@ -36,7 +36,8 @@ fun ResultNavigationApp() {
         modifier = Modifier.fillMaxSize()
     ) {
         composable(Screen.Home.route) { backStackEntry ->
-            HomeScreen(navController, backStackEntry)
+            val stateBackStackEntry = rememberUpdatedState(backStackEntry)
+            HomeScreen(navController, stateBackStackEntry)
         }
         composable(Screen.ColorPicker.route) {
             ColorPickerScreen(navController)
