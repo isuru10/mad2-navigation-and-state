@@ -114,24 +114,17 @@ fun AppContent() {
             // No argument retrieval here! The ViewModel handles it.
             UserDetailScreen(
                 // Use the standard ViewModel factory (provided by compose-lifecycle library)
-                viewModel = viewModel(factory = createViewModelFactory())
+                viewModel = viewModel(factory = UserDetailViewModelFactory)
             )
         }
     }
 }
 
 // Simple factory needed for demonstration outside of an Activity context
-private fun createViewModelFactory() = object : androidx.lifecycle.ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(UserDetailViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return UserDetailViewModel(
-                // SavedStateHandle is usually provided by the framework, mocking here
-                SavedStateHandle(mapOf(USER_ID_ARG to 101)), // Fallback for simple demo
-                UserRepository()
-            ) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
+val UserDetailViewModelFactory = viewModelFactory {
+    initializer {
+        val savedStateHandle = createSavedStateHandle()
+        UserDetailViewModel(savedStateHandle)
     }
 }
 
