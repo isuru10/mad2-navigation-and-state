@@ -48,26 +48,26 @@ fun ResultNavigationApp() {
 // --- Screen A (Source): Receives the Result ---
 
 @Composable
-fun HomeScreen(navController: NavController, backStackEntry: State<androidx.navigation.NavBackStackEntry?>) {
+fun HomeScreen(navController: NavController, backStackEntry: State<NavBackStackEntry?>) {
     // 1. Access the current NavBackStackEntry's SavedStateHandle
     val savedStateHandle = backStackEntry.value?.savedStateHandle
 
     // 2. Observe the LiveData for the result key
     // The observed value will be the Color String, or null if no result has been set yet.
-    val colorResult by savedStateHandle?.getLiveData<String>(COLOR_RESULT_KEY)?.observeAsState()
+    val colorResult = savedStateHandle?.getLiveData<String>(COLOR_RESULT_KEY)?.observeAsState()
 
     // State to hold the applied color for the UI
     var appliedColor by remember { mutableStateOf(Color.LightGray) }
     var resultText by remember { mutableStateOf("No color selected yet.") }
 
     // 3. Crucial Cleanup and Handling: Use LaunchedEffect to handle the result once
-    LaunchedEffect(colorResult) {
-        val result = colorResult
+    LaunchedEffect(colorResult?.value) {
+        val result = colorResult?.value
         if (result != null) {
             // Processing the result
             appliedColor = Color(android.graphics.Color.parseColor(result))
             resultText = "Successfully applied color: $result"
-            
+
             // 4. IMPORTANT: Remove the key immediately to prevent re-triggering
             // (e.g., if we navigate away and come back to this screen)
             savedStateHandle?.remove<String>(COLOR_RESULT_KEY)
@@ -104,7 +104,6 @@ fun HomeScreen(navController: NavController, backStackEntry: State<androidx.navi
         }
     }
 }
-
 // --- Screen B (Destination): Sends the Result ---
 
 @Composable
